@@ -2,56 +2,43 @@
 
 class Solution {
     public String longestPalindrome(String s) {
-        String palindrome = "";
-        if (s.length() > 0){
-            palindrome = ""+s.charAt(0);
+        if (s.length() > 1){
+            String longestPalindrome = "";
             for (int i=1; i<s.length(); i++){
-                boolean couldBeEven = false;
-                // test for even condition
-                if (s.charAt(i)==s.charAt(i-1)){
-                    couldBeEven = true;
-                    palindrome = palindrome.length()<2 ? ""+s.charAt(i)+s.charAt(i-1) : palindrome;
+                // test for even palindrome (if able)
+                if (s.charAt(i-1) == s.charAt(i)){
+                    int offset = palindrome(s, i, true, 1);
+                    if ((offset*2)+2 > longestPalindrome.length()){
+                        longestPalindrome = s.substring((i-offset-1),(i+offset+1));
+                    }
                 }
-                // look for 3+ char palindrome
-                boolean isPalindrome = true;
-                int offset = 1;
-                while (isPalindrome && (offset <= i) && (offset+i < s.length())){
-                    boolean isEvenPalindrome = false;
-                    boolean isOddPalindrome = false;
-                    if (couldBeEven && i-offset-1>=0){
-                        char before = s.charAt(i-offset-1);
-                        char after = s.charAt(i+offset);
-                        if (before == after){
-                            isEvenPalindrome = true;
-                            String newPalindrome = s.substring((i-offset-1), (i+offset+1));
-                            if (palindrome.length() < newPalindrome.length()){
-                                palindrome = newPalindrome;
-                            }
-                        } else {
-                            couldBeEven = false;
-                        }
-                    }
-                    char before = s.charAt(i-offset);
-                    char after = s.charAt(i+offset);
-                    if (before == after){
-                        isOddPalindrome = true;
-                        String newPalindrome = s.substring((i-offset), (i+offset+1));
-                        if (palindrome.length() < newPalindrome.length()){
-                            palindrome = newPalindrome;
-                        }
-                    }
-                    if (!(isEvenPalindrome || isOddPalindrome)) {
-                        isPalindrome = false;
-                    }
-                    offset++;
+                // test for odd palindrome
+                int offset = palindrome(s, i, false, 1);
+                if ((offset*2)+1 > longestPalindrome.length()){
+                    longestPalindrome = s.substring((i-offset),(i+offset+1));
                 }
             }
+            return longestPalindrome;
         }
-        return palindrome;
+        return s;
+    }
+
+    public int palindrome(String s, int pivot, boolean isEven, int offset){
+        int i0 = isEven ? (pivot-offset-1) : (pivot-offset);
+        int i1 = (pivot+offset);
+        if ((i0>=0) && i1<s.length()){
+            char before = s.charAt(i0);
+            char after = s.charAt(i1);
+            if (before == after){
+                return 1 + palindrome(s, pivot, isEven, offset+1);
+            }
+            return 0;
+        }
+        return 0;
     }
 
     public static void main(String[] args){
         Solution test = new Solution();
-        System.out.println(test.longestPalindrome("fkwwkkf"));
+        System.out.println(test.longestPalindrome("bab"));
     }
 }
